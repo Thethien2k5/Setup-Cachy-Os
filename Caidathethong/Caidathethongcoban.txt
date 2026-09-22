@@ -19,12 +19,13 @@ chạy script "install.sh" đính kèm để tự động tái hiện 100% môi 
 MỤC LỤC:
   1. GỠ BỎ CÁC ỨNG DỤNG KHÔNG CẦN THIẾT (BLOATWARE / APP KHÔNG THÍCH HỢP)
   2. CÀI ĐẶT CÁC PHẦN MỀM THAY THẾ (CHUẨN WINDOWS)
-  3. CẤU HÌNH BỘ GÕ FCITX5 & TỰ ĐỘNG CHUYỂN EN KHI PHỤP MÀN HÌNH / KHÓA MÁY
-  4. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND
-  5. CẤU HÌNH CỬA SỔ DẠNG NỔI (FLOATING WINDOWS)
-  6. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
-  7. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
-  8. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
+  3. CẤU HÌNH TERMINAL KITTY TIỆN LỢI NHƯ WINDOWS (COPY / PASTE DỄ DÀNG)
+  4. CẤU HÌNH BỘ GÕ FCITX5 & TỰ ĐỘNG CHUYỂN EN KHI PHỤP MÀN HÌNH / KHÓA MÁY
+  5. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND
+  6. CẤU HÌNH CỬA SỔ DẠNG NỔI (FLOATING WINDOWS)
+  7. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
+  8. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
+  9. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
 --------------------------------------------------------------------------------
 
 ================================================================================
@@ -86,19 +87,38 @@ Các ứng dụng mới đã được cài đặt để thay thế hoàn hảo c
       sudo pacman -S --needed --noconfirm git wtype
 
 ================================================================================
-3. CẤU HÌNH BỘ GÕ FCITX5 & TỰ ĐỘNG CHUYỂN EN KHI PHỤP MÀN HÌNH / KHÓA MÁY
+3. CẤU HÌNH TERMINAL KITTY TIỆN LỢI NHƯ WINDOWS (COPY / PASTE DỄ DÀNG)
 ================================================================================
-3.1. Cài đặt bộ gõ tiếng Việt Fcitx5 Bamboo:
+Mặc định trên Linux Terminal, phím Ctrl + C dùng để ngắt lệnh (SIGINT) và không thể
+dùng để Copy như trên Windows, gây khó khăn cho người dùng quen Windows.
+
+Đã cấu hình lại file ~/.config/kitty/kitty.conf để hỗ trợ đầy đủ:
+  - copy_on_select yes:
+      Tự động Copy văn bản vào bộ nhớ đệm ngay khi dùng chuột kéo bôi đen chữ,
+      không cần bấm bất kỳ phím nào!
+  - map ctrl+c copy_or_interrupt:
+      Phím Ctrl + C thông minh:
+      + Nếu đang bôi đen chọn chữ -> Bấm Ctrl + C sẽ là COPY văn bản.
+      + Nếu không bôi đen -> Bấm Ctrl + C sẽ là hủy/ngắt lệnh như bình thường.
+  - map ctrl+v paste_from_clipboard:
+      Bấm Ctrl + V để DÁN (PASTE) trực tiếp nội dung vào terminal giống hệt Windows.
+  - map ctrl+shift+c copy_to_clipboard
+  - map ctrl+shift+v paste_from_clipboard
+
+================================================================================
+4. CẤU HÌNH BỘ GÕ FCITX5 & TỰ ĐỘNG CHUYỂN EN KHI PHỤP MÀN HÌNH / KHÓA MÁY
+================================================================================
+4.1. Cài đặt bộ gõ tiếng Việt Fcitx5 Bamboo:
   sudo pacman -S --needed --noconfirm fcitx5 fcitx5-bamboo fcitx5-gtk fcitx5-qt fcitx5-configtool
 
-3.2. Biến môi trường bộ gõ trong ~/.config/uwsm/env:
+4.2. Biến môi trường bộ gõ trong ~/.config/uwsm/env:
   export XMODIFIERS=@im=fcitx
   export QT_IM_MODULE=fcitx
 
-3.3. Khởi động Fcitx5 cùng Hyprland trong ~/.config/hypr/config/autostart.lua:
+4.3. Khởi động Fcitx5 cùng Hyprland trong ~/.config/hypr/config/autostart.lua:
   hl.exec_cmd("fcitx5 -d")
 
-3.4. Tự động chuyển về bộ gõ EN (keyboard-us) khi PHỤP MÀN HÌNH / KHÓA MÁY:
+4.4. Tự động chuyển về bộ gõ EN (keyboard-us) khi PHỤP MÀN HÌNH / KHÓA MÁY:
   Vấn đề: Khi gập màn hình laptop hoặc khóa máy, nếu bộ gõ đang ở chế độ tiếng Việt (Telex)
   thì khi mở máy lên gõ mật khẩu sẽ bị sai mật khẩu do dính dấu.
   
@@ -118,7 +138,7 @@ Các ứng dụng mới đã được cài đặt để thay thế hoàn hảo c
     Đã gộp lệnh: fcitx5-remote -s keyboard-us && noctalia msg session lock
 
 ================================================================================
-4. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND (~/.config/hypr/config/binds.lua)
+5. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND (~/.config/hypr/config/binds.lua)
 ================================================================================
 Hệ thống phím tắt đã được tối ưu hóa:
 
@@ -146,7 +166,7 @@ Hệ thống phím tắt đã được tối ưu hóa:
       Chuyển đổi qua lại giữa bộ gõ Tiếng Việt và Tiếng Anh (Fcitx5).
 
 ================================================================================
-5. CẤU HÌNH CỬA SỔ NỔI (FLOATING WINDOWS)
+6. CẤU HÌNH CỬA SỔ NỔI (FLOATING WINDOWS)
 ================================================================================
 Trong file ~/.config/hypr/config/windowrules.lua:
 Các ứng dụng tiện ích được cấu hình để luôn mở dạng cửa sổ nổi ở giữa màn hình giống Windows:
@@ -158,7 +178,7 @@ Các ứng dụng tiện ích được cấu hình để luôn mở dạng cửa
   })
 
 ================================================================================
-6. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
+7. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
 ================================================================================
 Trong file ~/.config/hypr/config/monitors.lua:
 Đồng bộ tỉ lệ hiển thị sắc nét chuẩn 1080p, không bị mờ hay phóng đại:
@@ -167,7 +187,7 @@ Trong file ~/.config/hypr/config/monitors.lua:
   - Cốc Cốc và thanh công cụ Noctalia hiển thị đúng tỷ lệ chuẩn, sắc nét.
 
 ================================================================================
-7. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
+8. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
 ================================================================================
 Trong file ~/.config/mimeapps.list:
   - Mở file văn bản, mã nguồn (.txt, .py, .c, .js, .md, .json, .log,...): VS Code (code.desktop).
@@ -176,7 +196,7 @@ Trong file ~/.config/mimeapps.list:
   - Mở liên kết web: Cốc Cốc (coccoc-browser-stable.desktop).
 
 ================================================================================
-8. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
+9. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
 ================================================================================
 Khi bạn thiết lập trên máy mới, bạn chỉ cần mở Antigravity và nhắn:
   "Hãy đọc thư mục /home/nttdz/Dự án/SetupCachyOSCoban/Caidathethong và cài đặt hệ thống giống như tài liệu này."
@@ -184,6 +204,7 @@ Khi bạn thiết lập trên máy mới, bạn chỉ cần mở Antigravity và
 Khi đó Antigravity sẽ:
   1. Chạy script: bash "/home/nttdz/Dự án/SetupCachyOSCoban/Caidathethong/install.sh"
   2. Copy toàn bộ các file trong thư mục "configs/" vào ~/.config và ~/.local:
+     - configs/kitty/*     -> ~/.config/kitty/
      - configs/hypr/*      -> ~/.config/hypr/config/
      - configs/bin/*       -> ~/.local/bin/ (cấp quyền chmod +x)
      - configs/systemd/*   -> ~/.config/systemd/user/
