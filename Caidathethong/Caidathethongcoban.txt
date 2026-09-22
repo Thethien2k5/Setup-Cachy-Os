@@ -1,3 +1,10 @@
+Cách cài antigravity 2.0
+❯ sudo pacman -S paru : cài paru 
+❯ paru -S antigravity : dùng paru cài anti, nếu hỏi phiên bản thì chọn 2 , sau đó y để đồng ý cài
+
+
+
+
 ================================================================================
           HƯỚNG DẪN CÀI ĐẶT & THIẾT LẬP HỆ THỐNG CACHYOS / HYPRLAND
           (DÀNH CHO ANTIGRAVITY HOẶC NGƯỜI DÙNG CÀI ĐẶT TRÊN MÁY MỚI)
