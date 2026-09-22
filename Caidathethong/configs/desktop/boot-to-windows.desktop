@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Name=Khởi động vào Windows
+GenericName=Chuyển sang Windows
+Comment=Tự động khởi động lại máy tính và vào hệ điều hành Windows
+Exec=/home/nttdz/.local/bin/boot-to-windows
+Icon=/home/nttdz/.local/share/icons/windows.svg
+Terminal=false
+Type=Application
+Categories=System;Utility;
+Keywords=win;windows;w;reboot;restart;boot;khoi dong;he dieu hanh;os;
+StartupNotify=false
