@@ -56,6 +56,10 @@ mkdir -p ~/.local/bin
 mkdir -p ~/.local/share/applications
 mkdir -p ~/.config/systemd/user
 
+# Kitty configs
+mkdir -p ~/.config/kitty
+cp -rf "$CONFIGS_DIR/kitty/"* ~/.config/kitty/ 2>/dev/null || true
+
 # Hyprland configs
 cp -rf "$CONFIGS_DIR/hypr/"* ~/.config/hypr/config/
 
