@@ -1,0 +1,191 @@
+================================================================================
+          HƯỚNG DẪN CÀI ĐẶT & THIẾT LẬP HỆ THỐNG CACHYOS / HYPRLAND
+          (DÀNH CHO ANTIGRAVITY HOẶC NGƯỜI DÙNG CÀI ĐẶT TRÊN MÁY MỚI)
+================================================================================
+
+Tài liệu này ghi lại toàn bộ các bước thêm, xóa, sửa phần mềm, thiết lập phím tắt,
+cấu hình cửa sổ, bộ gõ tiếng Việt, màn hình kép và các tác vụ tự động hóa đã thực hiện.
+Khi cài đặt trên một thiết bị CachyOS mới, Antigravity chỉ cần đọc tài liệu này hoặc
+chạy script "install.sh" đính kèm để tự động tái hiện 100% môi trường làm việc.
+
+--------------------------------------------------------------------------------
+MỤC LỤC:
+  1. GỠ BỎ CÁC ỨNG DỤNG KHÔNG CẦN THIẾT (BLOATWARE / APP KHÔNG THÍCH HỢP)
+  2. CÀI ĐẶT CÁC PHẦN MỀM THAY THẾ (CHUẨN WINDOWS)
+  3. CẤU HÌNH BỘ GÕ FCITX5 & TỰ ĐỘNG CHUYỂN EN KHI PHỤP MÀN HÌNH / KHÓA MÁY
+  4. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND
+  5. CẤU HÌNH CỬA SỔ DẠNG NỔI (FLOATING WINDOWS)
+  6. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
+  7. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
+  8. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
+--------------------------------------------------------------------------------
+
+================================================================================
+1. GỠ BỎ CÁC ỨNG DỤNG KHÔNG CẦN THIẾT
+================================================================================
+Các ứng dụng mặc định sau đây đã được gỡ bỏ khỏi hệ thống vì trải nghiệm kém hoặc
+không phù hợp:
+  - dolphin: Quản lý tệp của KDE, không phù hợp môi trường Hyprland/kéo thả khó chịu.
+  - firefox: Trình duyệt mặc định, được thay thế bằng Cốc Cốc.
+  - vim: Trình soạn thảo terminal không cần thiết.
+  - kcalc / gnome-calculator: Máy tính bỏ túi.
+  - qview: Trình xem ảnh cũ, trải nghiệm kém.
+  - uuctl / shelly: Các tiện ích không sử dụng.
+  - kwrite / gedit: Trình soạn thảo text cũ, thay bằng VS Code và Micro.
+
+Lệnh gỡ bỏ:
+  sudo pacman -Rns --noconfirm dolphin firefox vim kcalc qview 2>/dev/null || true
+  # Lưu ý: Giữ lại 'micro' cho nhu cầu soạn thảo nhanh trong terminal.
+
+================================================================================
+2. CÀI ĐẶT CÁC PHẦN MỀM THAY THẾ (CHUẨN WINDOWS)
+================================================================================
+Các ứng dụng mới đã được cài đặt để thay thế hoàn hảo các chức năng trên:
+
+2.1. Trình duyệt Cốc Cốc (coccoc-browser):
+  - Cài đặt từ AUR:
+      paru -S --needed --noconfirm coccoc-browser
+  - Tự động chạy khi khởi động hệ thống.
+  - Tạo file desktop tùy chỉnh ~/.local/share/applications/coccoc-browser.desktop
+    để hỗ trợ tìm kiếm nhanh bằng phím tắt: "c", "cc", "coccoc".
+
+2.2. Trình soạn thảo mã nguồn VS Code (Code-OSS):
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm code
+  - Tùy biến nhận diện: Đổi tên hiển thị từ "Code - OSS" thành "VS Code" và gắn icon
+    VS Code chuẩn tại ~/.local/share/applications/code.desktop
+  - Từ khóa tìm kiếm nhanh: "v", "vs", "vscode", "code".
+
+2.3. Trình quản lý tệp Nemo (thay thế Dolphin):
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm nemo
+  - Giao diện thân thiện, kéo thả mượt mà, hỗ trợ thùng rác, chuột phải đầy đủ tính năng.
+  - Cấu hình mở mặc định dạng cửa sổ nổi (floating) 1100x700 ở giữa màn hình.
+  - Từ khóa tìm kiếm nhanh: "f", "file", "nemo", "quan li tep".
+
+2.4. Trình quản lý tác vụ Task Manager (Mission Center):
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm mission-center
+  - Tên lệnh thực thi: missioncenter (đã tạo symlink mission-center để tương thích).
+  - Phím tắt mở nhanh: Ctrl + Shift + Escape (chuẩn Windows).
+
+2.5. Trình xem ảnh Loupe (thay thế qView):
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm loupe
+  - Giao diện hiện đại, phóng to thu nhỏ mượt mà, hỗ trợ mở cửa sổ nổi floating.
+
+2.6. Quản lý mã nguồn & công cụ mô phỏng phím:
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm git wtype
+
+================================================================================
+3. CẤU HÌNH BỘ GÕ FCITX5 & TỰ ĐỘNG CHUYỂN EN KHI PHỤP MÀN HÌNH / KHÓA MÁY
+================================================================================
+3.1. Cài đặt bộ gõ tiếng Việt Fcitx5 Bamboo:
+  sudo pacman -S --needed --noconfirm fcitx5 fcitx5-bamboo fcitx5-gtk fcitx5-qt fcitx5-configtool
+
+3.2. Biến môi trường bộ gõ trong ~/.config/uwsm/env:
+  export XMODIFIERS=@im=fcitx
+  export QT_IM_MODULE=fcitx
+
+3.3. Khởi động Fcitx5 cùng Hyprland trong ~/.config/hypr/config/autostart.lua:
+  hl.exec_cmd("fcitx5 -d")
+
+3.4. Tự động chuyển về bộ gõ EN (keyboard-us) khi PHỤP MÀN HÌNH / KHÓA MÁY:
+  Vấn đề: Khi gập màn hình laptop hoặc khóa máy, nếu bộ gõ đang ở chế độ tiếng Việt (Telex)
+  thì khi mở máy lên gõ mật khẩu sẽ bị sai mật khẩu do dính dấu.
+  
+  Giải pháp toàn diện đã triển khai:
+  - Tạo script: ~/.local/bin/auto-en-daemon.py
+    + Lắng nghe sự kiện UPower "LidIsClosed": Bất kể khi nào nắp laptop gập xuống hoặc mở lên,
+      nó lập tức kích hoạt lệnh: fcitx5-remote -s keyboard-us
+    + Lắng nghe tín hiệu D-Bus logind "PrepareForSleep": Khi máy tính chuẩn bị sleep / suspend
+      hoặc thức dậy, tự động chuyển về EN.
+    + Lắng nghe Hyprland socket2: Khi layer lockscreen xuất hiện hoặc màn hình tắt (DPMS 0),
+      tự động chuyển về EN.
+  - Đăng ký Systemd User Service: ~/.config/systemd/user/auto-en.service
+    + Lệnh kích hoạt:
+        systemctl --user daemon-reload
+        systemctl --user enable --now auto-en.service
+  - Phím tắt khóa màn hình (Super + L):
+    Đã gộp lệnh: fcitx5-remote -s keyboard-us && noctalia msg session lock
+
+================================================================================
+4. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND (~/.config/hypr/config/binds.lua)
+================================================================================
+Hệ thống phím tắt đã được tối ưu hóa:
+
+  - Alt + Space:
+      Mở thanh tìm kiếm ứng dụng (Launcher). Tự động chuyển bộ gõ sang EN khi mở.
+      Ưu tiên đề xuất:
+        + Gõ 'f'     -> Mở Trình quản lý tệp (Nemo)
+        + Gõ 'c'     -> Mở Cốc Cốc Browser
+        + Gõ 'v'/'vs'-> Mở VS Code
+        + Gõ 'a'     -> Mở Antigravity
+  
+  - Super + Tab (Win + Tab):
+      Chuyển đổi giữa các CỬA SỔ ứng dụng của hệ thống (Noctalia Window Switcher).
+  
+  - Ctrl + Shift + Esc:
+      Mở Trình quản lý tác vụ Task Manager (Mission Center).
+  
+  - Alt + Shift:
+      Bật / tắt kho cửa sổ phụ (Special Workspace / Scratchpad).
+  
+  - Super + L:
+      Khóa màn hình và tự chuyển bộ gõ về EN.
+  
+  - Win + Space (Super + Space):
+      Chuyển đổi qua lại giữa bộ gõ Tiếng Việt và Tiếng Anh (Fcitx5).
+
+================================================================================
+5. CẤU HÌNH CỬA SỔ NỔI (FLOATING WINDOWS)
+================================================================================
+Trong file ~/.config/hypr/config/windowrules.lua:
+Các ứng dụng tiện ích được cấu hình để luôn mở dạng cửa sổ nổi ở giữa màn hình giống Windows:
+  hl.window_rule({
+      match = { class = "^(nemo|Nemo|org.gnome.Loupe|io.missioncenter.MissionCenter)$" },
+      float = true,
+      size = { 1100, 700 },
+      center = true,
+  })
+
+================================================================================
+6. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
+================================================================================
+Trong file ~/.config/hypr/config/monitors.lua:
+Đồng bộ tỉ lệ hiển thị sắc nét chuẩn 1080p, không bị mờ hay phóng đại:
+  - Màn hình ngoài LG (HDMI-A-1): 1920x1080@60Hz, vị trí 0x0, scale 1.0.
+  - Màn hình laptop (eDP-2): 1920x1080@144Hz, vị trí 1920x0, scale 1.0.
+  - Cốc Cốc và thanh công cụ Noctalia hiển thị đúng tỷ lệ chuẩn, sắc nét.
+
+================================================================================
+7. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
+================================================================================
+Trong file ~/.config/mimeapps.list:
+  - Mở file văn bản, mã nguồn (.txt, .py, .c, .js, .md, .json, .log,...): VS Code (code.desktop).
+  - Mở hình ảnh (.png, .jpg, .jpeg, .webp, .bmp, .gif): Loupe (org.gnome.Loupe.desktop).
+  - Mở thư mục: Nemo (nemo.desktop).
+  - Mở liên kết web: Cốc Cốc (coccoc-browser-stable.desktop).
+
+================================================================================
+8. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
+================================================================================
+Khi bạn thiết lập trên máy mới, bạn chỉ cần mở Antigravity và nhắn:
+  "Hãy đọc thư mục /home/nttdz/Dự án/SetupCachyOSCoban/Caidathethong và cài đặt hệ thống giống như tài liệu này."
+
+Khi đó Antigravity sẽ:
+  1. Chạy script: bash "/home/nttdz/Dự án/SetupCachyOSCoban/Caidathethong/install.sh"
+  2. Copy toàn bộ các file trong thư mục "configs/" vào ~/.config và ~/.local:
+     - configs/hypr/*      -> ~/.config/hypr/config/
+     - configs/bin/*       -> ~/.local/bin/ (cấp quyền chmod +x)
+     - configs/systemd/*   -> ~/.config/systemd/user/
+     - configs/desktop/*   -> ~/.local/share/applications/
+     - configs/mimeapps.list -> ~/.config/mimeapps.list
+  3. Kích hoạt dịch vụ:
+     systemctl --user daemon-reload
+     systemctl --user enable --now auto-en.service
+  4. Reload lại Hyprland:
+     hyprctl reload
+  Toàn bộ hệ thống mới sẽ hoạt động y hệt như thiết bị hiện tại chỉ trong vài phút!
+================================================================================
