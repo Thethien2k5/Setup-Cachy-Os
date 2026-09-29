@@ -1,0 +1,34 @@
+﻿
+[2026-09-28 18:25:09] ================================================================
+[2026-09-28 18:25:09]    HE THONG KHOI DONG VA CHUYEN SANG LINUX (O DIA ROI)          
+[2026-09-28 18:25:09] ================================================================
+[2026-09-28 18:25:09] 
+[2026-09-28 18:25:09] [1/4] Kiem tra ket noi o dia roi Linux...
+[2026-09-28 18:25:11]  [OK] Da ket noi: JMicron Tech (Disk #2, Dung luong: 238.5 GB)
+[2026-09-28 18:25:11]  [*] Tim thay phan vung EFI tren o roi: Partition #1
+[2026-09-28 18:25:12]  [OK] Phat hien bootloader Linux: \EFI\BOOT\BOOTX64.EFI tren ESP
+[2026-09-28 18:25:12] 
+[2026-09-28 18:25:12] [2/4] Don sach & toi uu he dieu hanh Windows...
+[2026-09-28 18:25:12]  [OK] Da tat Fast Startup & Hibernate (chong khoa phan vung NTFS / loi dirty flag tren Linux).
+[2026-09-28 18:25:12]  [OK] Da dong bo gio BIOS/RTC sang UTC (chong lech 7 tieng khi sang Linux).
+[2026-09-28 18:25:12]  [OK] Dang commit va xa bo nho dem ghi dia...
+[2026-09-28 18:25:12] 
+[2026-09-28 18:25:12] [3/4] Cau hinh khoi dong UEFI sang Linux...
+[2026-09-28 18:25:12]  [*] Danh sach cac muc boot UEFI tim thay trong firmware:
+[2026-09-28 18:25:12]      - {21b8a080-b74e-11f1-80ae-806e6f6e6963}: 'UEFI OS' (Path: \EFI\BOOT\BOOTX64.EFI)
+[2026-09-28 18:25:12]      - {6ad31881-b649-11f1-80ac-806e6f6e6963}: 'cachyos' (Path: \EFI\cachyos\grubx64.efi)
+[2026-09-28 18:25:12]      - {b8d3a654-878b-11f1-8026-806e6f6e6963}: 'Limine' (Path: \EFI\limine\limine_x64.efi)
+[2026-09-28 18:25:12]  [OK] Phat hien Firmware Entry phu hop: {21b8a080-b74e-11f1-80ae-806e6f6e6963} ('UEFI OS')
+[2026-09-28 18:25:12]  [*] GUID duoc chon de boot: {21b8a080-b74e-11f1-80ae-806e6f6e6963} (UEFI OS)
+[2026-09-28 18:25:13]  [OK] Lenh bcdedit /set {fwbootmgr} bootsequence: The operation completed successfully.
+[2026-09-28 18:25:13]  [OK] Lenh bcdedit /bootsequence: The operation completed successfully.
+[2026-09-28 18:25:13] 
+[2026-09-28 18:25:13] ================================================================
+[2026-09-28 18:25:13]  [OK] DA CAU HINH XONG! MAY TINH SE KHOI DONG VAO LINUX.
+[2026-09-28 18:25:13] ================================================================
+[2026-09-28 18:25:13] LUU Y QUAN TRONG VOI MAINBOARD ASUS:
+[2026-09-28 18:25:13] Neu may khoi dong lai van vao Win, nguyen nhan la tinh nang Fast Boot
+[2026-09-28 18:25:13] trong BIOS cua ASUS da bo qua khoi tao cong USB khi boot!
+[2026-09-28 18:25:13] -> Khac phuc 1 lan duy nhat: Vao BIOS (an F2/Del khi bat may) -> Boot -> Fast Boot: Disabled.
+[2026-09-28 18:25:13] ================================================================
+[2026-09-28 18:25:13] 
