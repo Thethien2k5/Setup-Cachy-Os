@@ -138,32 +138,61 @@ dùng để Copy như trên Windows, gây khó khăn cho người dùng quen Win
     Đã gộp lệnh: fcitx5-remote -s keyboard-us && noctalia msg session lock
 
 ================================================================================
-5. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND (~/.config/hypr/config/binds.lua)
+5. CẤU HÌNH PHÍM TẮT HỆ THỐNG & THANH PERFORMANCE ĐIỀU KHIỂN
 ================================================================================
-Hệ thống phím tắt đã được tối ưu hóa:
+5.1. Danh sách phím tắt hệ thống đang hoạt động:
 
   - Alt + Space:
       Mở thanh tìm kiếm ứng dụng (Launcher). Tự động chuyển bộ gõ sang EN khi mở.
       Ưu tiên đề xuất:
-        + Gõ 'f'     -> Mở Trình quản lý tệp (Nemo)
-        + Gõ 'c'     -> Mở Cốc Cốc Browser
-        + Gõ 'v'/'vs'-> Mở VS Code
-        + Gõ 'a'     -> Mở Antigravity
+        + Gõ 'f'      -> Mở Trình quản lý tệp (Nemo)
+        + Gõ 'c'      -> Mở Cốc Cốc Browser
+        + Gõ 'v'/'vs' -> Mở VS Code
+        + Gõ 'a'      -> Mở Antigravity
   
-  - Super + Tab (Win + Tab):
-      Chuyển đổi giữa các CỬA SỔ ứng dụng của hệ thống (Noctalia Window Switcher).
-  
-  - Ctrl + Shift + Esc:
-      Mở Trình quản lý tác vụ Task Manager (Mission Center).
+  - Super + V (Win + V):
+      Mở bảng lịch sử Clipboard thông minh (Clipse):
+        + Hỗ trợ xem trước hình ảnh (IMAGE THUMBNAIL) trực quan thay vì chỉ hiện tên file hay binary data thô.
+        + Hỗ trợ lưu trữ cả văn bản (Text) lẫn hình ảnh (Images).
+        + Tìm kiếm nhanh, ghim mục yêu thích (phím P), xem toàn màn hình (phím Space).
+        + Chọn mục và Enter để copy vào bộ nhớ tạm.
   
   - Alt + Shift:
       Bật / tắt kho cửa sổ phụ (Special Workspace / Scratchpad).
   
+  - Win + Space (Super + Space):
+      Chuyển đổi qua lại giữa bộ gõ Tiếng Việt (Bamboo) và Tiếng Anh (Fcitx5).
+  
   - Super + L:
       Khóa màn hình và tự chuyển bộ gõ về EN.
   
-  - Win + Space (Super + Space):
-      Chuyển đổi qua lại giữa bộ gõ Tiếng Việt và Tiếng Anh (Fcitx5).
+  - Super + Q hoặc Alt + F4:
+      Đóng cửa sổ đang chọn.
+  
+  - Super + F:
+      Bật / tắt chế độ toàn màn hình (Fullscreen).
+  
+  - Super + Enter hoặc Super + T:
+      Mở Terminal Kitty.
+  
+  - Print / Win + Print:
+      Chụp ảnh màn hình (vùng chọn hoặc toàn màn hình).
+
+5.2. Tính năng tương tác trên thanh Performance (Caelestia Top Drawer):
+  - Khi rê chuột lên cạnh trên màn hình để mở Dashboard / Performance:
+  - Người dùng có thể nhấn chuột trực tiếp vào từng thẻ phần cứng:
+      + Nhấn thẻ CPU     -> Mở Mission Center chuyển thẳng đến biểu đồ CPU
+      + Nhấn thẻ GPU     -> Mở Mission Center chuyển thẳng đến biểu đồ GPU
+      + Nhấn thẻ Memory  -> Mở Mission Center chuyển thẳng đến biểu đồ RAM
+      + Nhấn thẻ Disk    -> Mở Mission Center chuyển thẳng đến biểu đồ Ổ cứng
+      + Nhấn thẻ Network -> Mở Mission Center chuyển thẳng đến biểu đồ Mạng
+
+5.3. Các phím tắt đã loại bỏ theo yêu cầu:
+  - Đã loại bỏ: Ctrl + Shift + Esc
+  - Đã loại bỏ: Super + A, Super + X
+  - Đã loại bỏ: Super + Tab, Alt + Tab, Alt + Shift + Tab
+  - Đã loại bỏ: Win + D, Win + M
+
 
 ================================================================================
 6. CẤU HÌNH CỬA SỔ NỔI (FLOATING WINDOWS)

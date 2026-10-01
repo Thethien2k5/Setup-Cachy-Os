@@ -60,10 +60,22 @@ mkdir -p ~/.config/systemd/user
 mkdir -p ~/.config/kitty
 cp -rf "$CONFIGS_DIR/kitty/"* ~/.config/kitty/ 2>/dev/null || true
 
+# Clipse configs (quản lý clipboard có preview ảnh)
+mkdir -p ~/.config/clipse
+cp -rf "$CONFIGS_DIR/clipse/"* ~/.config/clipse/ 2>/dev/null || true
+
+# Caelestia user configs
+mkdir -p ~/.config/caelestia
+cp -rf "$CONFIGS_DIR/caelestia/"* ~/.config/caelestia/ 2>/dev/null || true
+
+# Caelestia Quickshell dashboard configs (click Performance mở Mission Center)
+mkdir -p ~/.config/quickshell/caelestia/modules/dashboard/performance
+cp -rf "$CONFIGS_DIR/quickshell/"* ~/.config/quickshell/ 2>/dev/null || true
+
 # Hyprland configs
 cp -rf "$CONFIGS_DIR/hypr/"* ~/.config/hypr/config/
 
-# Local scripts
+# Local scripts & binaries (clipse, wtype, open-missioncenter, auto-en-daemon)
 cp -rf "$CONFIGS_DIR/bin/"* ~/.local/bin/
 chmod +x ~/.local/bin/*
 
