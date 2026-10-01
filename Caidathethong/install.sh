@@ -70,10 +70,6 @@ chmod +x ~/.local/bin/*
 # Tạo symlink mission-center nếu cần
 ln -sf /usr/bin/missioncenter ~/.local/bin/mission-center 2>/dev/null || true
 
-# Icons
-mkdir -p ~/.local/share/icons
-cp -rf "$CONFIGS_DIR/icons/"* ~/.local/share/icons/ 2>/dev/null || true
-
 # Desktop entries
 cp -rf "$CONFIGS_DIR/desktop/"* ~/.local/share/applications/
 update-desktop-database ~/.local/share/applications 2>/dev/null || true
