@@ -29,7 +29,6 @@ hl.window_rule({
     float = true,
     size = "760 560",
     center = true,
-    stayfocused = true,
 })
-hl.bind("SUPER + V", hl.dsp.exec_cmd("pkill -f 'kitty --class clipse' || kitty --class clipse -e clipse"))
+hl.bind("SUPER + V", hl.dsp.exec_cmd("toggle-clipse"))
 
