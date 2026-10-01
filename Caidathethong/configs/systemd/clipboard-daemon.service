@@ -1,0 +1,12 @@
+[Unit]
+Description=Clipboard Viewer Daemon (Win+V)
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/home/nttdz/.local/bin/clipboard-viewer-daemon
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

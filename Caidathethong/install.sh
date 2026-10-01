@@ -102,11 +102,13 @@ if ! grep -q "QT_IM_MODULE=fcitx" ~/.config/uwsm/env; then
     echo "export QT_IM_MODULE=fcitx" >> ~/.config/uwsm/env
 fi
 
-# 6. Thiết lập và kích hoạt background service tự chuyển EN khi phụp màn hình
-echo ">>> [6/7] Kích hoạt auto-en background service..."
+# 6. Thiết lập và kích hoạt background services
+echo ">>> [6/7] Kích hoạt auto-en & clipboard-daemon services..."
 cp -f "$CONFIGS_DIR/systemd/auto-en.service" ~/.config/systemd/user/
+cp -f "$CONFIGS_DIR/systemd/clipboard-daemon.service" ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now auto-en.service || true
+systemctl --user enable --now clipboard-daemon.service || true
 
 # 7. Reload Hyprland
 echo ">>> [7/7] Nạp lại cấu hình Hyprland..."
