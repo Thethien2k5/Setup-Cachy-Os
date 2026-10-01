@@ -1,0 +1,364 @@
+#!/usr/bin/env python3
+import sys
+import os
+import json
+import subprocess
+from datetime import datetime
+import gi
+
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, Adw, Gdk, Gio, GLib, Pango
+
+CLIPSE_DIR = os.path.expanduser("~/.config/clipse")
+HISTORY_FILE = os.path.join(CLIPSE_DIR, "clipboard_history.json")
+
+CUSTOM_CSS = """
+window.clipboard-window {
+    background-color: rgba(24, 25, 32, 0.95);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.search-bar {
+    margin: 10px 14px 6px 14px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    padding: 6px 10px;
+}
+
+.search-bar:focus-within {
+    border-color: #3584e4;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.clip-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin: 4px 10px;
+    transition: all 150ms ease-in-out;
+}
+
+.clip-card:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.clip-card-header {
+    opacity: 0.65;
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.clip-text {
+    font-size: 13px;
+    color: #e6e6e6;
+    line-height: 1.35;
+}
+
+.clip-image-frame {
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 4px;
+    margin-top: 4px;
+}
+
+.btn-icon-del {
+    opacity: 0.45;
+    transition: opacity 150ms ease;
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+
+.btn-icon-del:hover {
+    opacity: 1.0;
+    color: #ff5555;
+    background-color: rgba(255, 85, 85, 0.15);
+}
+
+.empty-label {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 14px;
+    margin-top: 40px;
+}
+"""
+
+class ClipboardApp(Adw.Application):
+    def __init__(self):
+        super().__init__(application_id="com.cachyos.clipboardviewer", flags=Gio.ApplicationFlags.FLAGS_NONE)
+
+    def do_activate(self):
+        win = self.props.active_window
+        if not win:
+            win = ClipboardWindow(application=self)
+        win.present()
+
+class ClipboardWindow(Gtk.ApplicationWindow):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_title("Lịch sử Clipboard")
+        self.set_default_size(460, 620)
+        self.add_css_class("clipboard-window")
+
+        # Load CSS
+        provider = Gtk.CssProvider()
+        provider.load_from_string(CUSTOM_CSS)
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+
+        # Style
+        Adw.StyleManager.get_default().set_color_scheme(Adw.ColorScheme.PREFER_DARK)
+
+        # Header bar
+        header = Adw.HeaderBar()
+        header.set_show_end_title_buttons(True)
+        title_widget = Adw.WindowTitle(title="Lịch sử Clipboard (Win + V)")
+        header.set_title_widget(title_widget)
+
+        clear_btn = Gtk.Button(label="Xóa hết")
+        clear_btn.add_css_class("flat")
+        clear_btn.connect("clicked", self.on_clear_all)
+        header.pack_end(clear_btn)
+
+        # Main layout
+        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        main_box.append(header)
+
+        # Search bar
+        self.search_entry = Gtk.SearchEntry()
+        self.search_entry.add_css_class("search-bar")
+        self.search_entry.set_placeholder_text("Tìm kiếm văn bản hoặc hình ảnh...")
+        self.search_entry.connect("search-changed", self.on_search_changed)
+        main_box.append(self.search_entry)
+
+        # Scrolled window
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_vexpand(True)
+        scrolled.set_hexpand(True)
+        scrolled.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+
+        self.list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        self.list_box.set_margin_top(4)
+        self.list_box.set_margin_bottom(12)
+        scrolled.set_child(self.list_box)
+        main_box.append(scrolled)
+
+        self.set_child(main_box)
+
+        # Key controller for Esc
+        key_controller = Gtk.EventControllerKey()
+        key_controller.connect("key-pressed", self.on_key_pressed)
+        self.add_controller(key_controller)
+
+        # Load history
+        self.load_history()
+
+    def on_key_pressed(self, controller, keyval, keycode, state):
+        if keyval == Gdk.KEY_Escape:
+            self.close()
+            return True
+        return False
+
+    def load_history(self, filter_text=""):
+        # Clear existing children
+        while child := self.list_box.get_first_child():
+            self.list_box.remove(child)
+
+        if not os.path.exists(HISTORY_FILE):
+            self.show_empty("Chưa có lịch sử clipboard.")
+            return
+
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            items = data.get("clipboardHistory", [])
+        except Exception as e:
+            self.show_empty(f"Lỗi đọc dữ liệu: {e}")
+            return
+
+        if not items:
+            self.show_empty("Clipboard đang trống.")
+            return
+
+        filter_lower = filter_text.strip().lower()
+        count = 0
+
+        for idx, item in enumerate(items):
+            file_path = item.get("filePath")
+            val = item.get("value", "")
+            recorded = item.get("recorded", "")
+            is_image = file_path and file_path != "null" and os.path.exists(file_path)
+
+            # Filtering
+            if filter_lower:
+                if is_image:
+                    if "ảnh" not in filter_lower and "anh" not in filter_lower and "img" not in filter_lower and "image" not in filter_lower:
+                        continue
+                else:
+                    if filter_lower not in val.lower():
+                        continue
+
+            card = self.create_card(item, idx, is_image, file_path, val, recorded)
+            self.list_box.append(card)
+            count += 1
+
+        if count == 0:
+            self.show_empty("Không tìm thấy kết quả phù hợp.")
+
+    def show_empty(self, message):
+        lbl = Gtk.Label(label=message)
+        lbl.add_css_class("empty-label")
+        self.list_box.append(lbl)
+
+    def create_card(self, item, idx, is_image, file_path, val, recorded):
+        # Outer card container
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        card.add_css_class("clip-card")
+        card.set_cursor(Gdk.Cursor.new_from_name("pointer"))
+
+        # Header row (Type, Time, Delete button)
+        header_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        header_row.add_css_class("clip-card-header")
+
+        # Type indicator
+        icon_name = "image-x-generic-symbolic" if is_image else "edit-copy-symbolic"
+        type_icon = Gtk.Image.new_from_icon_name(icon_name)
+        type_icon.set_pixel_size(14)
+        header_row.append(type_icon)
+
+        # Formatted time
+        time_str = "Vừa xong"
+        if recorded:
+            try:
+                dt = datetime.strptime(recorded.split(".")[0], "%Y-%m-%d %H:%M:%S")
+                time_str = dt.strftime("%H:%M:%S - %d/%m")
+            except:
+                time_str = recorded.split(".")[0]
+
+        tag_text = f"Hình ảnh ({time_str})" if is_image else f"Văn bản ({time_str})"
+        tag_lbl = Gtk.Label(label=tag_text)
+        tag_lbl.set_hexpand(True)
+        tag_lbl.set_xalign(0)
+        header_row.append(tag_lbl)
+
+        # Delete button
+        del_btn = Gtk.Button()
+        del_btn.set_icon_name("user-trash-symbolic")
+        del_btn.add_css_class("flat")
+        del_btn.add_css_class("btn-icon-del")
+        del_btn.set_tooltip_text("Xóa khỏi lịch sử")
+        del_btn.connect("clicked", lambda b, it=item: self.delete_item(it))
+        header_row.append(del_btn)
+
+        card.append(header_row)
+
+        # Content: Real Image Thumbnail or Text Preview
+        if is_image:
+            img_frame = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            img_frame.add_css_class("clip-image-frame")
+
+            picture = Gtk.Picture.new_for_filename(file_path)
+            picture.set_content_fit(Gtk.ContentFit.CONTAIN)
+            picture.set_can_shrink(True)
+            picture.set_size_request(-1, 160)
+            img_frame.append(picture)
+
+            card.append(img_frame)
+        else:
+            txt_lbl = Gtk.Label()
+            txt_lbl.set_text(val)
+            txt_lbl.add_css_class("clip-text")
+            txt_lbl.set_wrap(True)
+            txt_lbl.set_wrap_mode(Pango.WrapMode.WORD_CHAR)
+            txt_lbl.set_lines(4)
+            txt_lbl.set_ellipsize(Pango.EllipsizeMode.END)
+            txt_lbl.set_xalign(0)
+            card.append(txt_lbl)
+
+        # Click event to copy and close
+        gesture = Gtk.GestureClick()
+        gesture.connect("released", lambda g, n, x, y, it=item: self.copy_and_exit(it))
+        card.add_controller(gesture)
+
+        return card
+
+    def copy_and_exit(self, item):
+        file_path = item.get("filePath")
+        val = item.get("value", "")
+
+        if file_path and file_path != "null" and os.path.exists(file_path):
+            with open(file_path, "rb") as f:
+                subprocess.run(["wl-copy", "-t", "image/png"], stdin=f)
+        else:
+            subprocess.run(["wl-copy"], input=val.encode("utf-8"))
+
+        self.close()
+
+        # Tự động dán vào cửa sổ trước đó giống hệt Windows Win+V
+        try:
+            subprocess.Popen("sleep 0.15 && wtype -M ctrl -k v -m ctrl", shell=True)
+        except:
+            pass
+
+    def delete_item(self, item):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            items = data.get("clipboardHistory", [])
+
+            # Filter out this item
+            new_items = []
+            for it in items:
+                if it == item:
+                    # Remove image file if exists
+                    fp = it.get("filePath")
+                    if fp and fp != "null" and os.path.exists(fp):
+                        try:
+                            os.remove(fp)
+                        except:
+                            pass
+                else:
+                    new_items.append(it)
+
+            data["clipboardHistory"] = new_items
+            with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+
+            self.load_history(self.search_entry.get_text())
+        except Exception as e:
+            print("Lỗi xóa mục:", e)
+
+    def on_clear_all(self, btn):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            items = data.get("clipboardHistory", [])
+            for it in items:
+                fp = it.get("filePath")
+                if fp and fp != "null" and os.path.exists(fp):
+                    try:
+                        os.remove(fp)
+                    except:
+                        pass
+
+            with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+                json.dump({"clipboardHistory": []}, f)
+
+            self.load_history()
+        except Exception as e:
+            print("Lỗi dọn dẹp:", e)
+
+    def on_search_changed(self, entry):
+        self.load_history(entry.get_text())
+
+if __name__ == "__main__":
+    app = ClipboardApp()
+    app.run(sys.argv)

@@ -1,6 +1,6 @@
 #!/bin/bash
-if pgrep -f 'kitty --class clipse' >/dev/null 2>&1; then
-    pkill -f 'kitty --class clipse'
+if pgrep -f 'clipboard-viewer' >/dev/null 2>&1; then
+    pkill -f 'clipboard-viewer'
 else
-    env LANG=en_US.UTF-8 kitty --class clipse -e /home/nttdz/.local/bin/clipse >/dev/null 2>&1 &
+    ~/.local/bin/clipboard-viewer >/dev/null 2>&1 &
 fi
