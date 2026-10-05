@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Antigravity
+Comment=Experience liftoff
+GenericName=AI Coding Assistant
+Exec=/usr/bin/antigravity %F
+Icon=antigravity
+Type=Application
+StartupNotify=false
+StartupWMClass=Antigravity
+Categories=TextEditor;Development;IDE;
+Actions=new-empty-window;
+Keywords=a;ag;antigravity;ai;assistant;tro ly;
+
+[Desktop Action new-empty-window]
+Name=New Empty Window
+Exec=/usr/bin/antigravity --new-window %F
+Icon=antigravity
+MimeType=x-scheme-handler/antigravity;application/x-antigravity-workspace;

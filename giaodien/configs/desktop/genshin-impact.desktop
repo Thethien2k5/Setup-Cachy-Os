@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Genshin Impact
+GenericName=Action RPG
+Comment=Launch Genshin Impact via Lutris
+Exec=/home/nttdz/.local/bin/launch-genshin.sh
+Icon=genshin-impact
+Terminal=false
+Categories=Game;
+Keywords=genshin;impact;mihoyo;hoyoverse;game;
+StartupWMClass=GenshinImpact.exe

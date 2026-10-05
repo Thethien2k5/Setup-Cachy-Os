@@ -1,0 +1,258 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# livewall-ctl - Bộ điều khiển hình nền động 4K & Phong cách màu cho Hyprland
+# Tích hợp hoàn hảo với Caelestia Shell (Quickshell) & Material You Theming
+# ==============================================================================
+
+set -euo pipefail
+unset LD_LIBRARY_PATH
+
+STATE_DIR="$HOME/.local/state/livewall"
+CURRENT_FILE="$STATE_DIR/current_video"
+MODE_FILE="$STATE_DIR/mode"
+WALLPAPERS_DIR="$HOME/Ảnh động/Wallpapers"
+CACHE_DIR="$HOME/.cache/livewall"
+SHELL_CONFIG="$HOME/.config/caelestia/shell.json"
+
+SCHEMES=("dynamic" "catppuccin" "tokyonight" "dracula" "nord" "rosepine" "everforest" "gruvbox" "caelestia")
+
+mkdir -p "$STATE_DIR" "$CACHE_DIR" "$WALLPAPERS_DIR"
+
+notify() {
+    notify-send -a "Live Wallpaper" "$@" 2>/dev/null || true
+}
+
+set_shell_wallpaper_enabled() {
+    local enabled="$1"
+    if [ -f "$SHELL_CONFIG" ]; then
+        python3 -c "
+import json
+try:
+    with open('$SHELL_CONFIG', 'r') as f:
+        cfg = json.load(f)
+except Exception:
+    cfg = {}
+if 'background' not in cfg:
+    cfg['background'] = {}
+cfg['background']['wallpaperEnabled'] = ($enabled == 1)
+with open('$SHELL_CONFIG', 'w') as f:
+    json.dump(cfg, f, indent=2)
+"
+    fi
+}
+
+cmd_set() {
+    local target="${1:-}"
+    if [ -z "$target" ]; then
+        echo "Lỗi: Cần cung cấp đường dẫn video hoặc ảnh." >&2
+        return 1
+    fi
+
+    local abs_path
+    abs_path="$(realpath "$target")"
+
+    if [ ! -f "$abs_path" ]; then
+        echo "Lỗi: Không tìm thấy file: $abs_path" >&2
+        return 1
+    fi
+
+    local ext="${abs_path##*.}"
+    ext="$(echo "$ext" | tr '[:upper:]' '[:lower:]')"
+
+    case "$ext" in
+        mp4|webm|mkv|mov|avi)
+            local hash
+            hash="$(echo -n "$abs_path" | sha256sum | cut -d' ' -f1)"
+            local poster="$CACHE_DIR/${hash}.jpg"
+
+            if [ ! -f "$poster" ]; then
+                ffmpeg -ss 00:00:02 -i "$abs_path" -vframes 1 -q:v 2 "$poster" -y >/dev/null 2>&1 || \
+                ffmpeg -i "$abs_path" -vframes 1 -q:v 2 "$poster" -y >/dev/null 2>&1 || true
+            fi
+
+            echo "$abs_path" > "$CURRENT_FILE"
+            echo "live" > "$MODE_FILE"
+
+            set_shell_wallpaper_enabled 0
+
+            if [ -f "$poster" ]; then
+                caelestia scheme set -n dynamic >/dev/null 2>&1 || true
+                caelestia wallpaper -f "$poster" >/dev/null 2>&1 || true
+            fi
+
+            pkill -x mpvpaper 2>/dev/null || true
+            sleep 0.2
+            setsid mpvpaper -p -o "no-audio loop hwdec=auto" '*' "$abs_path" </dev/null >/dev/null 2>&1 &
+
+            hyprctl reload >/dev/null 2>&1 || true
+
+            if [ "${2:-}" != "--silent" ]; then
+                local filename
+                filename="$(basename "$abs_path")"
+                notify -i "${poster:-video-x-generic}" "Hình nền động 4K" "Đang phát: $filename"
+            fi
+            ;;
+        jpg|jpeg|png|webp)
+            pkill -x mpvpaper 2>/dev/null || true
+            echo "static" > "$MODE_FILE"
+            set_shell_wallpaper_enabled 1
+            caelestia wallpaper -f "$abs_path" >/dev/null 2>&1 || true
+            hyprctl reload >/dev/null 2>&1 || true
+
+            if [ "${2:-}" != "--silent" ]; then
+                local filename
+                filename="$(basename "$abs_path")"
+                notify -i "$abs_path" "Hình nền tĩnh" "Đã áp dụng: $filename"
+            fi
+            ;;
+        *)
+            echo "Định dạng file không được hỗ trợ: $ext" >&2
+            return 1
+            ;;
+    esac
+}
+
+get_videos() {
+    find "$WALLPAPERS_DIR" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.webm" -o -iname "*.mkv" \) | sort
+}
+
+cmd_next() {
+    mapfile -t videos < <(get_videos)
+    if [ ${#videos[@]} -eq 0 ]; then
+        mapfile -t videos < <(find "$HOME/Ảnh động" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.webm" \) | sort)
+    fi
+
+    if [ ${#videos[@]} -eq 0 ]; then
+        notify -u normal "Chưa có video" "Hãy chép video 4K vào thư mục: $WALLPAPERS_DIR"
+        return 1
+    fi
+
+    local current=""
+    if [ -f "$CURRENT_FILE" ]; then
+        current="$(cat "$CURRENT_FILE")"
+    fi
+
+    local next_index=0
+    for i in "${!videos[@]}"; do
+        if [ "${videos[$i]}" = "$current" ]; then
+            next_index=$(( (i + 1) % ${#videos[@]} ))
+            break
+        fi
+    done
+
+    cmd_set "${videos[$next_index]}"
+}
+
+cmd_prev() {
+    mapfile -t videos < <(get_videos)
+    if [ ${#videos[@]} -eq 0 ]; then
+        return 1
+    fi
+
+    local current=""
+    if [ -f "$CURRENT_FILE" ]; then
+        current="$(cat "$CURRENT_FILE")"
+    fi
+
+    local prev_index=0
+    for i in "${!videos[@]}"; do
+        if [ "${videos[$i]}" = "$current" ]; then
+            prev_index=$(( (i - 1 + ${#videos[@]}) % ${#videos[@]} ))
+            break
+        fi
+    done
+
+    cmd_set "${videos[$prev_index]}"
+}
+
+cmd_toggle() {
+    local mode="live"
+    if [ -f "$MODE_FILE" ]; then
+        mode="$(cat "$MODE_FILE")"
+    fi
+
+    if [ "$mode" = "live" ] && pgrep -x mpvpaper >/dev/null; then
+        pkill -x mpvpaper 2>/dev/null || true
+        set_shell_wallpaper_enabled 1
+        echo "static" > "$MODE_FILE"
+        caelestia shell -d -r >/dev/null 2>&1 || true
+        notify -i "media-playback-pause" "Tạm dừng hình nền động" "Chuyển về ảnh nền tĩnh Caelestia"
+    else
+        local video=""
+        if [ -f "$CURRENT_FILE" ]; then
+            video="$(cat "$CURRENT_FILE")"
+        fi
+        if [ -n "$video" ] && [ -f "$video" ]; then
+            cmd_set "$video"
+        else
+            cmd_next
+        fi
+    fi
+}
+
+cmd_style_next() {
+    local current_scheme
+    current_scheme="$(caelestia scheme get 2>/dev/null | grep -i "Name:" | head -n1 | awk '{print $2}' || echo "dynamic")"
+
+    local next_scheme="${SCHEMES[0]}"
+    for i in "${!SCHEMES[@]}"; do
+        if [ "${SCHEMES[$i]}" = "$current_scheme" ]; then
+            local next_idx=$(( (i + 1) % ${#SCHEMES[@]} ))
+            next_scheme="${SCHEMES[$next_idx]}"
+            break
+        fi
+    done
+
+    caelestia scheme set -n "$next_scheme" >/dev/null 2>&1 || true
+    hyprctl reload >/dev/null 2>&1 || true
+
+    notify -i "preferences-desktop-theme" "Đổi phong cách màu" "Phong cách hiện tại: $next_scheme"
+}
+
+cmd_init() {
+    local mode="live"
+    if [ -f "$MODE_FILE" ]; then
+        mode="$(cat "$MODE_FILE")"
+    fi
+
+    if [ "$mode" = "live" ]; then
+        local video=""
+        if [ -f "$CURRENT_FILE" ]; then
+            video="$(cat "$CURRENT_FILE")"
+        fi
+        if [ -n "$video" ] && [ -f "$video" ]; then
+            cmd_set "$video" --silent
+        else
+            mapfile -t videos < <(get_videos)
+            if [ ${#videos[@]} -gt 0 ]; then
+                cmd_set "${videos[0]}" --silent
+            fi
+        fi
+    fi
+}
+
+case "${1:-}" in
+    set)
+        shift
+        cmd_set "$@"
+        ;;
+    next)
+        cmd_next
+        ;;
+    prev)
+        cmd_prev
+        ;;
+    toggle)
+        cmd_toggle
+        ;;
+    style-next)
+        cmd_style_next
+        ;;
+    init)
+        cmd_init
+        ;;
+    *)
+        echo "Sử dụng: livewall-ctl {set <file>|next|prev|toggle|style-next|init}"
+        exit 1
+        ;;
+esac

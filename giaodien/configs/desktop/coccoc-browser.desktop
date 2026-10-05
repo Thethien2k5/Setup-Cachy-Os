@@ -1,0 +1,23 @@
+[Desktop Entry]
+Version=1.0
+Name=Cốc Cốc Browser
+GenericName=Trình duyệt Web
+Comment=Truy cập Internet
+Exec=/usr/bin/coccoc-browser-stable %U
+StartupNotify=true
+StartupWMClass=coccoc-browser
+Terminal=false
+Icon=coccoc-browser
+Type=Application
+Categories=Network;WebBrowser;
+Keywords=c;cc;coccoc;coc coc;cốc cốc;trinh duyet;browser;web;internet;
+MimeType=application/pdf;text/html;text/xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/coccoc-browser;
+Actions=new-window;new-private-window;
+
+[Desktop Action new-window]
+Name=Cửa sổ Mới
+Exec=/usr/bin/coccoc-browser-stable
+
+[Desktop Action new-private-window]
+Name=Cửa sổ ẩn danh mới
+Exec=/usr/bin/coccoc-browser-stable --incognito

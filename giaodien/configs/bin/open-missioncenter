@@ -1,0 +1,36 @@
+#!/bin/bash
+PAGE="${1:-cpu}"
+
+case "$PAGE" in
+    cpu|processor)
+        MC_PAGE="cpu"
+        ;;
+    memory|ram)
+        MC_PAGE="memory"
+        ;;
+    gpu|graphics)
+        MC_PAGE="gpu"
+        ;;
+    storage|disk)
+        MC_PAGE="disk"
+        ;;
+    network|net)
+        MC_PAGE="network"
+        ;;
+    *)
+        MC_PAGE="cpu"
+        ;;
+esac
+
+gsettings set io.missioncenter.MissionCenter window-selected-page 'performance-page'
+gsettings set io.missioncenter.MissionCenter performance-selected-page "$MC_PAGE"
+
+if pgrep -x missioncenter >/dev/null; then
+    hyprctl dispatch focuswindow "class:^(io.missioncenter.MissionCenter)$"
+else
+    if command -v uwsm >/dev/null 2>&1; then
+        uwsm app -- missioncenter &
+    else
+        missioncenter &
+    fi
+fi

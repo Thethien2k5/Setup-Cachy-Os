@@ -11,21 +11,23 @@ Cách cài antigravity 2.0
 ================================================================================
 
 Tài liệu này ghi lại toàn bộ các bước thêm, xóa, sửa phần mềm, thiết lập phím tắt,
-cấu hình cửa sổ, bộ gõ tiếng Việt, màn hình kép và các tác vụ tự động hóa đã thực hiện.
+cấu hình cửa sổ, bộ gõ tiếng Việt, màn hình kép, hình nền động và các tác vụ tự động hóa đã thực hiện.
 Khi cài đặt trên một thiết bị CachyOS mới, Antigravity chỉ cần đọc tài liệu này hoặc
 chạy script "install.sh" đính kèm để tự động tái hiện 100% môi trường làm việc.
 
 --------------------------------------------------------------------------------
 MỤC LỤC:
   1. GỠ BỎ CÁC ỨNG DỤNG KHÔNG CẦN THIẾT (BLOATWARE / APP KHÔNG THÍCH HỢP)
-  2. CÀI ĐẶT CÁC PHẦN MỀM THAY THẾ (CHUẨN WINDOWS)
+  2. CÀI ĐẶT CÁC PHẦN MỀM THAY THẾ & BỔ SUNG (CHUẨN WINDOWS & TỐI ƯU LINUX)
   3. CẤU HÌNH TERMINAL KITTY TIỆN LỢI NHƯ WINDOWS (COPY / PASTE DỄ DÀNG)
   4. CẤU HÌNH BỘ GÕ FCITX5 & TỰ ĐỘNG CHUYỂN EN KHI PHỤP MÀN HÌNH / KHÓA MÁY
-  5. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND
-  6. CẤU HÌNH CỬA SỔ DẠNG NỔI (FLOATING WINDOWS)
-  7. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
-  8. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
-  9. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
+  5. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND & CAELESTIA SHELL
+  6. CẤU HÌNH CỬA SỔ NỔI & TỐI ƯU WORKSPACE GAME TRONG HYPR-USER.LUA
+  7. CẤU HÌNH HÌNH NỀN ĐỘNG ANIME 4K & THEME ĐỘNG (LIVEWALL-CTL)
+  8. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
+  9. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
+  10. TÍNH NĂNG KHỞI ĐỘNG SANG WINDOWS 1-CLICK (BOOT-TO-WINDOWS)
+  11. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
 --------------------------------------------------------------------------------
 
 ================================================================================
@@ -46,9 +48,9 @@ Lệnh gỡ bỏ:
   # Lưu ý: Giữ lại 'micro' cho nhu cầu soạn thảo nhanh trong terminal.
 
 ================================================================================
-2. CÀI ĐẶT CÁC PHẦN MỀM THAY THẾ (CHUẨN WINDOWS)
+2. CÀI ĐẶT CÁC PHẦN MỀM THAY THẾ & BỔ SUNG (CHUẨN WINDOWS & TỐI ƯU LINUX)
 ================================================================================
-Các ứng dụng mới đã được cài đặt để thay thế hoàn hảo các chức năng trên:
+Các ứng dụng mới đã được cài đặt để thay thế hoàn hảo các chức năng trên và bổ sung tiện ích:
 
 2.1. Trình duyệt Cốc Cốc (coccoc-browser):
   - Cài đặt từ AUR:
@@ -75,16 +77,44 @@ Các ứng dụng mới đã được cài đặt để thay thế hoàn hảo c
   - Cài đặt:
       sudo pacman -S --needed --noconfirm mission-center
   - Tên lệnh thực thi: missioncenter (đã tạo symlink mission-center để tương thích).
-  - Phím tắt mở nhanh: Ctrl + Shift + Escape (chuẩn Windows).
+  - Phím tắt mở nhanh: Ctrl + Shift + Escape (chuẩn Windows) hoặc click thẻ Performance.
 
 2.5. Trình xem ảnh Loupe (thay thế qView):
   - Cài đặt:
       sudo pacman -S --needed --noconfirm loupe
   - Giao diện hiện đại, phóng to thu nhỏ mượt mà, hỗ trợ mở cửa sổ nổi floating.
 
-2.6. Quản lý mã nguồn & công cụ mô phỏng phím:
+2.6. Trình chụp và chỉnh sửa / chú thích ảnh Satty (satty):
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm satty slurp grim wl-clipboard
+  - Tính năng: Chụp vùng màn hình tùy chọn, hỗ trợ vẽ mũi tên, tô màu, vẽ khung chữ nhật,
+    viết chữ (text), che mờ (blur) thông tin nhạy cảm.
+  - Tích hợp script ~/.local/bin/satty-shot.sh: Tự động sao chép ảnh vào clipboard ngay
+    khi chụp xong và cho phép nhấn Enter để lưu lại.
+
+2.7. Trình quay video màn hình Kooha (kooha):
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm kooha
+  - Tính năng: Quay video màn hình chất lượng cao trên Wayland, hỗ trợ định dạng MP4, GIF, WebM.
+  - Hỗ trợ quay toàn màn hình hoặc khoanh vùng khu vực cần quay, ghi kèm âm thanh mic/hệ thống.
+
+2.8. Bộ công cụ văn phòng tương thích Microsoft Office - OnlyOffice (onlyoffice-bin):
+  - Cài đặt:
+      paru -S --needed --noconfirm onlyoffice-bin
+  - Tính năng: Soạn thảo văn bản Word (.docx), bảng tính Excel (.xlsx), trình chiếu PowerPoint (.pptx)
+    với độ tương thích định dạng cao và giữ nguyên định dạng phong cách Microsoft Office.
+
+2.9. Trình phát hình nền động Video Anime 4K - Mpvpaper & MPV (mpvpaper, mpv):
+  - Cài đặt:
+      sudo pacman -S --needed --noconfirm mpvpaper mpv ffmpeg
+  - Tính năng: Chạy mượt mà video chất lượng cao 4K làm hình nền động cho Hyprland
+    với mức tiêu thụ phần cứng cực thấp nhờ phần cứng tăng tốc (hwdec=auto).
+  - Tích hợp script ~/.local/bin/livewall-ctl để đổi video, đổi theme màu động theo video.
+
+2.10. Quản lý mã nguồn Git & Công cụ dòng lệnh GitHub CLI (git, gh):
   - Cài đặt:
       sudo pacman -S --needed --noconfirm git wtype
+  - Quản lý phiên bản mã nguồn, clone repository và mô phỏng phím bấm cho Wayland.
 
 ================================================================================
 3. CẤU HÌNH TERMINAL KITTY TIỆN LỢI NHƯ WINDOWS (COPY / PASTE DỄ DÀNG)
@@ -138,7 +168,7 @@ dùng để Copy như trên Windows, gây khó khăn cho người dùng quen Win
     Đã gộp lệnh: fcitx5-remote -s keyboard-us && noctalia msg session lock
 
 ================================================================================
-5. CẤU HÌNH PHÍM TẮT HỆ THỐNG & THANH PERFORMANCE ĐIỀU KHIỂN
+5. CẤU HÌNH PHÍM TẮT HỆ THỐNG HYPRLAND & CAELESTIA SHELL
 ================================================================================
 5.1. Danh sách phím tắt hệ thống đang hoạt động:
 
@@ -152,11 +182,30 @@ dùng để Copy như trên Windows, gây khó khăn cho người dùng quen Win
   
   - Super + V (Win + V):
       Mở bảng lịch sử Clipboard thông minh (Clipse):
-        + Hỗ trợ xem trước hình ảnh (IMAGE THUMBNAIL) trực quan thay vì chỉ hiện tên file hay binary data thô.
-        + Hỗ trợ lưu trữ cả văn bản (Text) lẫn hình ảnh (Images).
+        + Hỗ trợ xem trước hình ảnh (IMAGE THUMBNAIL) trực quan thay vì chỉ hiện text thô.
+        + Hỗ trợ lưu trữ cả văn bản lẫn hình ảnh.
         + Tìm kiếm nhanh, ghim mục yêu thích (phím P), xem toàn màn hình (phím Space).
         + Chọn mục và Enter để copy vào bộ nhớ tạm.
   
+  - Win + Shift + S hoặc phím Print:
+      Chụp màn hình và mở trình chỉnh sửa chú thích Satty (chuẩn Windows Snipping Tool):
+      Khoanh vùng chọn -> Tự sao chép ảnh vào Clipboard + Mở cửa sổ Satty để vẽ/ghi chú.
+
+  - Win + Alt + R hoặc Ctrl + Alt + R:
+      Mở trình quay video màn hình Kooha.
+
+  - Win + Alt + W:
+      Chuyển nhanh sang video hình nền động 4K tiếp theo trong thư mục ~/Ảnh động/Wallpapers.
+
+  - Win + Alt + C:
+      Đổi nhanh phong cách bảng màu Material You (Dynamic, Catppuccin, Tokyo Night, Dracula, Nord,...).
+
+  - Win + Alt + B:
+      Bật / Tạm dừng phát video hình nền động (chuyển đổi linh hoạt giữa ảnh tĩnh và video).
+
+  - Bấm và nhả phím Win (Super_L release):
+      Bật / tắt hiển thị thanh taskbar dọc bên trái màn hình.
+
   - Alt + Shift:
       Bật / tắt kho cửa sổ phụ (Special Workspace / Scratchpad).
   
@@ -174,9 +223,6 @@ dùng để Copy như trên Windows, gây khó khăn cho người dùng quen Win
   
   - Super + Enter hoặc Super + T:
       Mở Terminal Kitty.
-  
-  - Print / Win + Print:
-      Chụp ảnh màn hình (vùng chọn hoặc toàn màn hình).
 
 5.2. Tính năng tương tác trên thanh Performance (Caelestia Top Drawer):
   - Khi rê chuột lên cạnh trên màn hình để mở Dashboard / Performance:
@@ -187,18 +233,12 @@ dùng để Copy như trên Windows, gây khó khăn cho người dùng quen Win
       + Nhấn thẻ Disk    -> Mở Mission Center chuyển thẳng đến biểu đồ Ổ cứng
       + Nhấn thẻ Network -> Mở Mission Center chuyển thẳng đến biểu đồ Mạng
 
-5.3. Các phím tắt đã loại bỏ theo yêu cầu:
-  - Đã loại bỏ: Ctrl + Shift + Esc
-  - Đã loại bỏ: Super + A, Super + X
-  - Đã loại bỏ: Super + Tab, Alt + Tab, Alt + Shift + Tab
-  - Đã loại bỏ: Win + D, Win + M
-
-
 ================================================================================
-6. CẤU HÌNH CỬA SỔ NỔI (FLOATING WINDOWS)
+6. CẤU HÌNH CỬA SỔ NỔI & TỐI ƯU WORKSPACE GAME TRONG HYPR-USER.LUA
 ================================================================================
-Trong file ~/.config/hypr/config/windowrules.lua:
-Các ứng dụng tiện ích được cấu hình để luôn mở dạng cửa sổ nổi ở giữa màn hình giống Windows:
+6.1. Quy tắc cửa sổ nổi (Floating Windows):
+Trong file ~/.config/hypr/config/windowrules.lua và ~/.config/caelestia/hypr-user.lua:
+Các ứng dụng tiện ích được cấu hình để luôn mở dạng cửa sổ nổi ở giữa màn hình:
   hl.window_rule({
       match = { class = "^(nemo|Nemo|org.gnome.Loupe|io.missioncenter.MissionCenter)$" },
       float = true,
@@ -206,43 +246,91 @@ Các ứng dụng tiện ích được cấu hình để luôn mở dạng cửa
       center = true,
   })
 
+  hl.window_rule({
+      match = { class = "com.cachyos.clipboardviewer" },
+      float = true,
+      size = "480 650",
+      center = true,
+  })
+
+6.2. Tối ưu hóa điều hướng Game tự động sang Workspace 5 (Màn 144Hz):
+Trong file ~/.config/caelestia/hypr-user.lua:
+Tất cả các tựa game và trình giả lập được tự động ghim cố định sang Workspace 5 trên màn hình laptop 144Hz (eDP-2) để đạt tần số quét và FPS cao nhất:
+  hl.workspace_rule({ workspace = "5", monitor = "eDP-2" })
+
+  local gameClasses = "^(steam_app_.*|gamescope|[Mm]inecraft.*|net\\.minecraft\\.client.*|org\\.lwjgl.*|osu!|ryujinx|yuzu|rpcs3)$"
+
+  hl.window_rule({
+      match = { class = gameClasses },
+      workspace = "5",
+  })
+
+  hl.window_rule({
+      match = { title = "^([Mm]inecraft.*)$" },
+      workspace = "5",
+  })
+
 ================================================================================
-7. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
+7. CẤU HÌNH HÌNH NỀN ĐỘNG ANIME 4K & THEME ĐỘNG (LIVEWALL-CTL)
+================================================================================
+- Thư mục chứa video hình nền: ~/Ảnh động/Wallpapers
+- Script điều khiển: ~/.local/bin/livewall-ctl
+- Cơ chế:
+  + Dùng mpvpaper phát video nền phần cứng (hardware accelerated).
+  + Tự động trích xuất frame đại diện của video để làm bảng màu Dynamic cho Caelestia Shell.
+  + Tự động khởi chạy livewall-ctl init khi vào Hyprland.
+
+================================================================================
+8. CẤU HÌNH MÀN HÌNH KÉP (DUAL MONITOR SCALE 1.0)
 ================================================================================
 Trong file ~/.config/hypr/config/monitors.lua:
 Đồng bộ tỉ lệ hiển thị sắc nét chuẩn 1080p, không bị mờ hay phóng đại:
   - Màn hình ngoài LG (HDMI-A-1): 1920x1080@60Hz, vị trí 0x0, scale 1.0.
   - Màn hình laptop (eDP-2): 1920x1080@144Hz, vị trí 1920x0, scale 1.0.
-  - Cốc Cốc và thanh công cụ Noctalia hiển thị đúng tỷ lệ chuẩn, sắc nét.
+  - Cốc Cốc và thanh công cụ Noctalia / Caelestia hiển thị đúng tỷ lệ chuẩn, sắc nét.
 
 ================================================================================
-8. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
+9. CẤU HÌNH ỨNG DỤNG MẶC ĐỊNH (MIME ASSOCIATIONS)
 ================================================================================
 Trong file ~/.config/mimeapps.list:
   - Mở file văn bản, mã nguồn (.txt, .py, .c, .js, .md, .json, .log,...): VS Code (code.desktop).
+  - Mở tài liệu văn phòng (.docx, .xlsx, .pptx): OnlyOffice (onlyoffice-desktopeditors.desktop).
   - Mở hình ảnh (.png, .jpg, .jpeg, .webp, .bmp, .gif): Loupe (org.gnome.Loupe.desktop).
   - Mở thư mục: Nemo (nemo.desktop).
   - Mở liên kết web: Cốc Cốc (coccoc-browser-stable.desktop).
 
 ================================================================================
-9. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
+10. TÍNH NĂNG KHỞI ĐỘNG SANG WINDOWS 1-CLICK (BOOT-TO-WINDOWS)
+================================================================================
+- Script: ~/.local/bin/boot-to-windows
+- File desktop: ~/.local/share/applications/boot-to-windows.desktop
+- Cách hoạt động: Sử dụng lệnh "efibootmgr -n 0002" để thiết lập lần khởi động tiếp theo
+  sẽ vào thẳng Windows Boot Manager mà không cần vào BIOS/Grub chỉnh thủ công.
+
+================================================================================
+11. HƯỚNG DẪN TỰ ĐỘNG THỰC THI CHO ANTIGRAVITY TRÊN MÁY MỚI
 ================================================================================
 Khi bạn thiết lập trên máy mới, bạn chỉ cần mở Antigravity và nhắn:
   "Hãy đọc thư mục /home/nttdz/Dự án/SetupCachyOSCoban/Caidathethong và cài đặt hệ thống giống như tài liệu này."
 
 Khi đó Antigravity sẽ:
   1. Chạy script: bash "/home/nttdz/Dự án/SetupCachyOSCoban/Caidathethong/install.sh"
-  2. Copy toàn bộ các file trong thư mục "configs/" vào ~/.config và ~/.local:
-     - configs/kitty/*     -> ~/.config/kitty/
-     - configs/hypr/*      -> ~/.config/hypr/config/
-     - configs/bin/*       -> ~/.local/bin/ (cấp quyền chmod +x)
-     - configs/systemd/*   -> ~/.config/systemd/user/
-     - configs/desktop/*   -> ~/.local/share/applications/
+  2. Cài đặt toàn bộ phần mềm từ Official Repo và AUR.
+  3. Đồng bộ toàn bộ các file trong thư mục "configs/" vào ~/.config và ~/.local:
+     - configs/kitty/*       -> ~/.config/kitty/
+     - configs/caelestia/*    -> ~/.config/caelestia/
+     - configs/quickshell/*   -> ~/.config/quickshell/
+     - configs/hypr/*        -> ~/.config/hypr/
+     - configs/bin/*         -> ~/.local/bin/ (cấp quyền chmod +x)
+     - configs/systemd/*     -> ~/.config/systemd/user/
+     - configs/desktop/*     -> ~/.local/share/applications/
      - configs/mimeapps.list -> ~/.config/mimeapps.list
-  3. Kích hoạt dịch vụ:
+  4. Kích hoạt dịch vụ:
      systemctl --user daemon-reload
      systemctl --user enable --now auto-en.service
-  4. Reload lại Hyprland:
+     systemctl --user enable --now clipboard-daemon.service
+  5. Khởi chạy hình nền động và nạp lại Hyprland:
+     livewall-ctl init
      hyprctl reload
   Toàn bộ hệ thống mới sẽ hoạt động y hệt như thiết bị hiện tại chỉ trong vài phút!
 ================================================================================

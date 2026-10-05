@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Script tự động khởi động lại vào Windows
+
+# 1. Thông báo cho người dùng
+notify-send -i /home/nttdz/.local/share/icons/windows.svg "Khởi động vào Windows" "Hệ thống đang chuẩn bị khởi động lại sang Windows..." 2>/dev/null || true
+
+# 2. Đặt BootNext = 0002 (Windows Boot Manager)
+if sudo -n /usr/bin/efibootmgr -n 0002 >/dev/null 2>&1; then
+    # Thành công với sudo NOPASSWD
+    systemctl reboot
+elif pkexec /usr/bin/efibootmgr -n 0002 >/dev/null 2>&1; then
+    # Chạy qua polkit dialog nếu chưa có NOPASSWD
+    systemctl reboot
+else
+    # Mở terminal hỏi mật khẩu nếu cả hai cách trên chưa được cấp quyền
+    kitty --hold -e bash -c "sudo /usr/bin/efibootmgr -n 0002 && systemctl reboot"
+fi

@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=VS Code (Visual Studio Code)
+Comment=Code Editing. Redefined.
+GenericName=VS Code
+Exec=code %F
+Icon=/home/nttdz/.local/share/icons/vscode.png
+Type=Application
+StartupNotify=false
+StartupWMClass=code-oss
+Categories=TextEditor;Development;IDE;
+MimeType=text/plain;text/x-chdr;text/x-csrc;text/x-c++hdr;text/x-c++src;text/x-java;text/x-dsrc;text/x-pascal;text/x-perl;text/x-python;application/x-php;application/xml;text/html;text/css;text/x-sql;text/x-diff;text/x-markdown;application/x-code-oss-workspace;
+Actions=new-empty-window;
+Keywords=v;vs;vscode;code;visual studio code;lap trinh;editor;ide;
+
+[Desktop Action new-empty-window]
+Name=New Empty Window
+Exec=code --new-window %F
+Icon=/home/nttdz/.local/share/icons/vscode.png

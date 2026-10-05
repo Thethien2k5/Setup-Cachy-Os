@@ -26,16 +26,28 @@ sudo pacman -S --needed --noconfirm \
     loupe \
     git \
     wtype \
+    satty \
+    kooha \
+    slurp \
+    grim \
+    wl-clipboard \
+    mpv \
+    mpvpaper \
+    ffmpeg \
+    pavucontrol \
+    normcap \
     fcitx5 \
     fcitx5-bamboo \
     fcitx5-gtk \
     fcitx5-qt \
     fcitx5-configtool \
     python-dbus \
-    python-gobject
+    python-gobject \
+    python-materialyoucolor \
+    papirus-icon-theme
 
-# 3. Cài đặt Cốc Cốc Browser từ AUR
-echo ">>> [3/7] Cài đặt Cốc Cốc Browser từ AUR..."
+# 3. Cài đặt Cốc Cốc Browser & OnlyOffice từ AUR
+echo ">>> [3/7] Cài đặt Cốc Cốc Browser & OnlyOffice từ AUR..."
 AUR_HELPER=""
 if command -v paru >/dev/null 2>&1; then
     AUR_HELPER="paru"
@@ -44,9 +56,9 @@ elif command -v yay >/dev/null 2>&1; then
 fi
 
 if [ -n "$AUR_HELPER" ]; then
-    $AUR_HELPER -S --needed --noconfirm coccoc-browser || true
+    $AUR_HELPER -S --needed --noconfirm coccoc-browser onlyoffice-bin || true
 else
-    echo "Lưu ý: Chưa tìm thấy paru/yay để cài coccoc-browser."
+    echo "Lưu ý: Chưa tìm thấy paru/yay để cài coccoc-browser & onlyoffice-bin."
 fi
 
 # 4. Sao chép và phân bổ các file cấu hình
@@ -55,6 +67,7 @@ mkdir -p ~/.config/hypr/config
 mkdir -p ~/.local/bin
 mkdir -p ~/.local/share/applications
 mkdir -p ~/.config/systemd/user
+mkdir -p "$HOME/Ảnh động/Wallpapers"
 
 # Kitty configs
 mkdir -p ~/.config/kitty
@@ -68,22 +81,22 @@ cp -rf "$CONFIGS_DIR/clipse/"* ~/.config/clipse/ 2>/dev/null || true
 mkdir -p ~/.config/caelestia
 cp -rf "$CONFIGS_DIR/caelestia/"* ~/.config/caelestia/ 2>/dev/null || true
 
-# Caelestia Quickshell dashboard configs (click Performance mở Mission Center)
-mkdir -p ~/.config/quickshell/caelestia/modules/dashboard/performance
+# Caelestia Quickshell dashboard configs
+mkdir -p ~/.config/quickshell
 cp -rf "$CONFIGS_DIR/quickshell/"* ~/.config/quickshell/ 2>/dev/null || true
 
 # Hyprland configs
-cp -rf "$CONFIGS_DIR/hypr/"* ~/.config/hypr/config/
+cp -rf "$CONFIGS_DIR/hypr/"* ~/.config/hypr/config/ 2>/dev/null || true
 
-# Local scripts & binaries (clipse, wtype, open-missioncenter, auto-en-daemon)
-cp -rf "$CONFIGS_DIR/bin/"* ~/.local/bin/
+# Local scripts & binaries
+cp -rf "$CONFIGS_DIR/bin/"* ~/.local/bin/ 2>/dev/null || true
 chmod +x ~/.local/bin/*
 
 # Tạo symlink mission-center nếu cần
 ln -sf /usr/bin/missioncenter ~/.local/bin/mission-center 2>/dev/null || true
 
 # Desktop entries
-cp -rf "$CONFIGS_DIR/desktop/"* ~/.local/share/applications/
+cp -rf "$CONFIGS_DIR/desktop/"* ~/.local/share/applications/ 2>/dev/null || true
 update-desktop-database ~/.local/share/applications 2>/dev/null || true
 
 # MIME apps associations
@@ -104,14 +117,18 @@ fi
 
 # 6. Thiết lập và kích hoạt background services
 echo ">>> [6/7] Kích hoạt auto-en & clipboard-daemon services..."
-cp -f "$CONFIGS_DIR/systemd/auto-en.service" ~/.config/systemd/user/
-cp -f "$CONFIGS_DIR/systemd/clipboard-daemon.service" ~/.config/systemd/user/
+cp -f "$CONFIGS_DIR/systemd/auto-en.service" ~/.config/systemd/user/ 2>/dev/null || true
+cp -f "$CONFIGS_DIR/systemd/clipboard-daemon.service" ~/.config/systemd/user/ 2>/dev/null || true
 systemctl --user daemon-reload
 systemctl --user enable --now auto-en.service || true
 systemctl --user enable --now clipboard-daemon.service || true
 
-# 7. Reload Hyprland
+# 7. Reload Hyprland & Livewall
 echo ">>> [7/7] Nạp lại cấu hình Hyprland..."
+if command -v livewall-ctl >/dev/null 2>&1; then
+    ~/.local/bin/livewall-ctl init 2>/dev/null || true
+fi
+
 if command -v hyprctl >/dev/null 2>&1; then
     hyprctl reload || true
 fi

@@ -1,0 +1,18 @@
+{
+  "appearance": {
+    "transparency": {
+      "enabled": true
+    }
+  },
+  "background": {
+    "wallpaperEnabled": false
+  },
+  "bar": {
+    "persistent": false,
+    "showOnHover": false
+  },
+  "paths": {
+    "mediaGif": "root:/assets/kurukuru.gif",
+    "sessionGif": "root:/assets/bongocat.gif"
+  }
+}
